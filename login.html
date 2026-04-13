@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Replace with your actual credentials
         const SUPABASE_URL = 'https://doyacbaoeytnqivpsels.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_gK-xj6a23FK1rUfAUf0R6Q_BCeji8aE';
     </script>
@@ -38,100 +39,133 @@
 
         <main class="login-main">
             <div class="login-container">
-                <h1>Member Access</h1>
-                <p>Enter your registered email to receive a secure login link.</p>
+                <div class="login-header">
+                    <img src="images/x-png.png" alt="Login Icon" style="width: 50px; margin-bottom: 1rem;">
+                    <h1>Member Access</h1>
+                    <p>Enter your registered email to receive a secure login link valid for 24 hours.</p>
+                </div>
                 
                 <form id="login-form">
                     <div class="input-group">
                         <input type="email" id="email" placeholder="Email Address" required autocomplete="email">
                     </div>
-                    <button type="submit" id="submit-btn" class="cta-btn">Request Access</button>
+                    <button type="submit" id="submit-btn" class="cta-btn">Send Magic Link</button>
                 </form>
                 
-                <div id="message" style="margin-top: 1.5rem; font-family: monospace; font-size: 0.9rem; min-height: 1.2em;"></div>
+                <div id="message" style="margin-top: 1.5rem; font-family: monospace; font-size: 0.8rem; letter-spacing: 1px; min-height: 1.2em; text-transform: uppercase;"></div>
             </div>
         </main>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        // 1. Initialize Supabase
+        // --- 1. SUPABASE LOGIC ---
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
         const loginForm = document.getElementById('login-form');
-        const emailInput = document.getElementById('email');
         const messageDiv = document.getElementById('message');
         const submitBtn = document.getElementById('submit-btn');
 
-        // 2. Secure Login Logic
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = emailInput.value.trim().toLowerCase();
+            const email = document.getElementById('email').value.trim().toLowerCase();
             
-            // UI Reset
             messageDiv.style.color = "#ffffff";
-            messageDiv.innerText = "CHECKING AUTHORIZATION...";
+            messageDiv.innerText = "> VERIFYING AUTHORIZATION...";
             submitBtn.disabled = true;
 
             try {
-                // A. Call the Secure Database Function (RPC)
-                // This keeps your actual whitelist table invisible to the public
+                // Call the secure RPC function
                 const { data: isAuthorized, error: rpcError } = await supabaseClient
                     .rpc('check_user_exists', { email_to_check: email });
 
-                if (rpcError) throw new Error("Connection error. Please try again later.");
-                
-                if (!isAuthorized) {
-                    throw new Error("Access Denied: Email not on authorized list.");
-                }
+                if (rpcError) throw new Error("SYSTEM ERROR: UNABLE TO REACH GATEKEEPER");
+                if (!isAuthorized) throw new Error("ACCESS DENIED: EMAIL NOT RECOGNIZED");
 
-                // B. Trigger Magic Link
+                // Trigger Magic Link
                 const { error: authError } = await supabaseClient.auth.signInWithOtp({
                     email: email,
-                    options: {
-                        // Ensure this matches your Supabase Redirect URL setting
-                        emailRedirectTo: window.location.origin + '/index.html',
-                    }
+                    options: { emailRedirectTo: window.location.origin + '/dashboard.html' }
                 });
 
                 if (authError) throw authError;
 
                 messageDiv.style.color = "#00ff00";
-                messageDiv.innerText = "SUCCESS: Check your inbox for the magic link.";
+                messageDiv.innerText = "> SUCCESS: MAGIC LINK TRANSMITTED TO INBOX";
 
             } catch (err) {
                 messageDiv.style.color = "#ff0000";
-                messageDiv.innerText = err.message.toUpperCase();
+                messageDiv.innerText = "> " + err.message;
                 submitBtn.disabled = false;
             }
         });
 
-        // 3. Visuals (Background Animation)
+        // --- 2. RESTORED THREE.JS (From login_old.html) ---
         const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.002);
+
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 30;
+
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
+        const networkGroup = new THREE.Group();
+        scene.add(networkGroup);
+
+        // Particle System
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 800;
+        const posArray = new Float32Array(particlesCount * 3);
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 50;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMesh = new THREE.Points(particlesGeometry, new THREE.PointsMaterial({
+            size: 0.1, color: 0xff0000, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending
+        }));
+        networkGroup.add(particlesMesh);
+
+        // Globe
         const globe = new THREE.Mesh(
             new THREE.IcosahedronGeometry(15, 2),
             new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true, transparent: true, opacity: 0.1 })
         );
-        scene.add(globe);
-        camera.position.z = 30;
+        networkGroup.add(globe);
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+        let mouseX = 0, mouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2) * 0.05;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.05;
+            // Custom Cursor
+            const cursor = document.getElementById('custom-cursor');
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
 
         function animate() {
             requestAnimationFrame(animate);
-            globe.rotation.y += 0.001;
+            const elapsedTime = clock.getElapsedTime();
+
+            networkGroup.rotation.y += 0.001;
+            networkGroup.position.x += (mouseX * 0.01 - networkGroup.position.x) * 0.05;
+            networkGroup.position.y += (-mouseY * 0.01 - networkGroup.position.y) * 0.05;
+
+            particlesMesh.rotation.y = elapsedTime * 0.05;
+            globe.scale.setScalar(1 + Math.sin(elapsedTime * 0.5) * 0.05); // Pulsing effect
+
             renderer.render(scene, camera);
         }
         animate();
 
-        // Cursor logic
-        const cursor = document.getElementById('custom-cursor');
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
 </body>
