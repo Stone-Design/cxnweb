@@ -9,7 +9,6 @@
     <script>
         const SUPABASE_URL = 'https://doyacbaoeytnqivpsels.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_gK-xj6a23FK1rUfAUf0R6Q_BCeji8aE';
-        const redirectUrl = window.location.href.replace('login.html', 'dashboard.html');
     </script>
 </head>
 <body class="solutions">
@@ -155,6 +154,8 @@
         const loginForm = document.getElementById('login-form');
         const messageDiv = document.getElementById('message');
         const submitBtn = document.getElementById('submit-btn');
+        const baseUrl = window.location.href.split('login.html')[0];
+        const redirectUrl = baseUrl + 'dashboard.html';
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
