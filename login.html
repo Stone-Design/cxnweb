@@ -9,6 +9,7 @@
     <script>
         const SUPABASE_URL = 'https://doyacbaoeytnqivpsels.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_gK-xj6a23FK1rUfAUf0R6Q_BCeji8aE';
+        const redirectUrl = window.location.href.replace('login.html', 'dashboard.html');
     </script>
 </head>
 <body class="solutions">
@@ -176,7 +177,7 @@
                 // Trigger Magic Link
                 const { error: authError } = await supabaseClient.auth.signInWithOtp({
                     email: email,
-                    options: { emailRedirectTo: window.location.origin + '/dashboard.html' }
+                    options: { emailRedirectTo: redirectUrl }
                 });
 
                 if (authError) throw authError;
