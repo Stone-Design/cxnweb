@@ -391,3 +391,20 @@ body.solutions .cta-btn {
     z-index: 999999; /* Keeps the cursor above all 3D canvases and UI layers */
     transform: translate(-50%, -50%); /* Centers the image exactly on the mouse coordinates */
 }
+
+.priv-btn {
+    padding: 15px 30px;
+    color: #3f0202;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #888;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    transition: cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.priv-btn:hover {
+    background-color: #3f0202;
+    color: #888;
+}
