@@ -16,9 +16,7 @@
 
     <img src="images/x-png.png" id="custom-cursor" alt="Cursor">
 
-    <!-- <div id="canvas-container"></div> -->
-    <div id="canvas-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none;"></div>
-
+    <div id="canvas-container"></div>
 
     <div id="ui-layer">
         <header>
@@ -167,26 +165,6 @@
             customCursor.style.top = event.clientY + 'px';
             sessionStorage.setItem('cursorX', event.clientX);
             sessionStorage.setItem('cursorY', event.clientY);
-        });
-
-        // Modal Interaction Logic
-        const loginModal = document.getElementById('loginModal');
-        const openModalBtn = document.getElementById('openLoginModal');
-        const closeModalBtn = document.getElementById('closeLoginModal');
-
-        openModalBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginModal.style.display = 'block';
-        });
-
-        closeModalBtn.addEventListener('click', () => {
-            loginModal.style.display = 'none';
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === loginModal) {
-                loginModal.style.display = 'none';
-            }
         });
 
         // 5. Animation Loop
