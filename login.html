@@ -3,46 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log in | cellXion Ltd</title>
+    <title>Login | cellXion Ltd</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Login Modal Styles */
-        .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
-            left: 0;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            background-color: rgba(0, 0, 0, 0.75); 
-            backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            margin: 10% auto; 
-            position: relative;
-        }
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close-btn:hover,
-        .close-btn:focus {
-            color: #fff;
-            text-decoration: none;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://doyacbaoeytnqivpsels.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_gK-xj6a23FK1rUfAUf0R6Q_BCeji8aE';
+    </script>
 </head>
-<body class="solutions">
+<body class="login-page">
 
     <img src="images/x-png.png" id="custom-cursor" alt="Cursor">
 
-    <div id="canvas-container"></div>
+    <div id="canvas-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none;"></div>
 
     <div id="ui-layer">
         <header>
@@ -58,170 +31,107 @@
                     <li><a href="index.html">Home</a></li>
                     <li><a href="solutions.html">QMTS</a></li>
                     <li><a href="gdpr.html">GDPR</a></li>
-                    <li><a href="#" style="color: #ff0000;">Log in</a></li>
+                    <li><a href="login.html" style="color: #ff0000;">Log in</a></li>
                 </ul>
             </nav>
         </header>
 
-        <div class="login-container">
-            <div class="login-card">
-                <img class="login-logo" src="images/x-png.png" alt="Logo">
-                <h2>CELLXION LTD</h2>
-                <p>Enter details to request temporary Log-in credentials</p>
+        <main class="login-main">
+            <div class="login-container">
+                <h1>Member Access</h1>
+                <p>Enter your registered email to receive a secure login link.</p>
                 
-                <form action="#" method="POST">
-                    <div class="form-group">
-                        <label for="company">Company</label>
-                        <input type="text" id="company" name="company" required placeholder="Enter company name">
+                <form id="login-form">
+                    <div class="input-group">
+                        <input type="email" id="email" placeholder="Email Address" required autocomplete="email">
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" required placeholder="Enter email address">
-                    </div>
-                    
-                    <button type="submit" class="cta-btn login-btn">Send Request</button>
-                    <br>
-                    <a class="cred-link" id="openLoginModal" href="#">Already have credentials? Click Here.</a>
+                    <button type="submit" id="submit-btn" class="cta-btn">Request Access</button>
                 </form>
+                
+                <div id="message" style="margin-top: 1.5rem; font-family: monospace; font-size: 0.9rem; min-height: 1.2em;"></div>
             </div>
-        </div>
+        </main>
     </div>
 
-    <!-- Login Modal -->
-    <div id="loginModal" class="modal">
-        <!-- Reusing the existing "login-card" class to maintain styling consistency -->
-        <div class="modal-content login-card">
-            <span class="close-btn" id="closeLoginModal">&times;</span>
-            <h2>Log In</h2>
-            <p>Enter your credentials to access your account.</p>
-            
-            <form action="#" method="POST">
-                <div class="form-group">
-                    <label for="login-username">Email / Username</label>
-                    <input type="text" id="login-username" name="login-username" required placeholder="Enter email or username">
-                </div>
-                
-                <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" name="login-password" required placeholder="Enter password">
-                </div>
-                
-                <button type="submit" class="cta-btn login-btn">Log In</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Load Three.js from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
     <script>
-        // 1. Scene Setup
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x050505, 0.002);
+        // 1. Initialize Supabase
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 2. Camera Setup
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 30;
-        camera.position.x = 0; // Centered to span the full screen width
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email');
+        const messageDiv = document.getElementById('message');
+        const submitBtn = document.getElementById('submit-btn');
 
-        // 3. Renderer Setup
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-        // 4. Create the 3D Telecom Network (Icosahedron Geometry)
-        const networkGroup = new THREE.Group();
-        scene.add(networkGroup);
-
-        // The Core Wireframe Globe
-        const geometry = new THREE.IcosahedronGeometry(15, 2);
-        const material = new THREE.MeshBasicMaterial({ 
-            color: 0xff0000, 
-            wireframe: true,
-            transparent: true,
-            opacity: 0.07
-        });
-        const globe = new THREE.Mesh(geometry, material);
-        networkGroup.add(globe);
-
-        // The Data Nodes (Particles)
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 800;
-        const posArray = new Float32Array(particlesCount * 3);
-
-        for(let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 40;
-        }
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.15, color: 0xff3333, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending
-        });
-        
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        networkGroup.add(particlesMesh);
-
-        // Custom Cursor Tracking
-        const customCursor = document.getElementById('custom-cursor');
-
-        // Restore last known mouse position
-        const savedCursorX = sessionStorage.getItem('cursorX');
-        const savedCursorY = sessionStorage.getItem('cursorY');
-        if (savedCursorX && savedCursorY) {
-            customCursor.style.left = savedCursorX + 'px';
-            customCursor.style.top = savedCursorY + 'px';
-        } else {
-            customCursor.style.opacity = '0';
-        }
-
-        document.addEventListener('mousemove', (event) => {
-            customCursor.style.opacity = '1';
-            customCursor.style.left = event.clientX + 'px';
-            customCursor.style.top = event.clientY + 'px';
-            sessionStorage.setItem('cursorX', event.clientX);
-            sessionStorage.setItem('cursorY', event.clientY);
-        });
-
-        // Modal Interaction Logic
-        const loginModal = document.getElementById('loginModal');
-        const openModalBtn = document.getElementById('openLoginModal');
-        const closeModalBtn = document.getElementById('closeLoginModal');
-
-        openModalBtn.addEventListener('click', (e) => {
+        // 2. Secure Login Logic
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            loginModal.style.display = 'block';
-        });
+            const email = emailInput.value.trim().toLowerCase();
+            
+            // UI Reset
+            messageDiv.style.color = "#ffffff";
+            messageDiv.innerText = "CHECKING AUTHORIZATION...";
+            submitBtn.disabled = true;
 
-        closeModalBtn.addEventListener('click', () => {
-            loginModal.style.display = 'none';
-        });
+            try {
+                // A. Call the Secure Database Function (RPC)
+                // This keeps your actual whitelist table invisible to the public
+                const { data: isAuthorized, error: rpcError } = await supabaseClient
+                    .rpc('check_user_exists', { email_to_check: email });
 
-        window.addEventListener('click', (e) => {
-            if (e.target === loginModal) {
-                loginModal.style.display = 'none';
+                if (rpcError) throw new Error("Connection error. Please try again later.");
+                
+                if (!isAuthorized) {
+                    throw new Error("Access Denied: Email not on authorized list.");
+                }
+
+                // B. Trigger Magic Link
+                const { error: authError } = await supabaseClient.auth.signInWithOtp({
+                    email: email,
+                    options: {
+                        // Ensure this matches your Supabase Redirect URL setting
+                        emailRedirectTo: window.location.origin + '/index.html',
+                    }
+                });
+
+                if (authError) throw authError;
+
+                messageDiv.style.color = "#00ff00";
+                messageDiv.innerText = "SUCCESS: Check your inbox for the magic link.";
+
+            } catch (err) {
+                messageDiv.style.color = "#ff0000";
+                messageDiv.innerText = err.message.toUpperCase();
+                submitBtn.disabled = false;
             }
         });
 
-        // 5. Animation Loop
-        const clock = new THREE.Clock();
+        // 3. Visuals (Background Animation)
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const globe = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(15, 2),
+            new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true, transparent: true, opacity: 0.1 })
+        );
+        scene.add(globe);
+        camera.position.z = 30;
 
         function animate() {
             requestAnimationFrame(animate);
-            const elapsedTime = clock.getElapsedTime();
-            networkGroup.rotation.y += 0.002;
-            networkGroup.rotation.x += 0.001;
-            particlesMesh.rotation.y = -elapsedTime * 0.05;
+            globe.rotation.y += 0.001;
             renderer.render(scene, camera);
         }
         animate();
 
-        // 6. Handle Window Resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        // Cursor logic
+        const cursor = document.getElementById('custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
         });
     </script>
 </body>
