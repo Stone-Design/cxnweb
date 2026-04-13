@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="styles.css">
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Replace with your actual credentials
         const SUPABASE_URL = 'https://doyacbaoeytnqivpsels.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_gK-xj6a23FK1rUfAUf0R6Q_BCeji8aE';
     </script>
@@ -59,46 +58,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <script>
-         // --- SUPABASE LOGIC ---
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const loginForm = document.getElementById('login-form');
-        const messageDiv = document.getElementById('message');
-        const submitBtn = document.getElementById('submit-btn');
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value.trim().toLowerCase();
-            
-            messageDiv.style.color = "#ffffff";
-            messageDiv.innerText = "> VERIFYING AUTHORIZATION...";
-            submitBtn.disabled = true;
-
-            try {
-                // Call the secure RPC function
-                const { data: isAuthorized, error: rpcError } = await supabaseClient
-                    .rpc('check_user_exists', { email_to_check: email });
-
-                if (rpcError) throw new Error("SYSTEM ERROR: UNABLE TO REACH GATEKEEPER");
-                if (!isAuthorized) throw new Error("ACCESS DENIED: EMAIL NOT RECOGNIZED");
-
-                // Trigger Magic Link
-                const { error: authError } = await supabaseClient.auth.signInWithOtp({
-                    email: email,
-                    options: { emailRedirectTo: window.location.origin + '/dashboard.html' }
-                });
-
-                if (authError) throw authError;
-
-                messageDiv.style.color = "#00ff00";
-                messageDiv.innerText = "> SUCCESS: MAGIC LINK TRANSMITTED TO INBOX";
-
-            } catch (err) {
-                messageDiv.style.color = "#ff0000";
-                messageDiv.innerText = "> " + err.message;
-                submitBtn.disabled = false;
-            }
-        });
-
         // 1. Scene Setup
         const scene = new THREE.Scene();
         scene.fog = new THREE.FogExp2(0x050505, 0.002);
@@ -185,6 +144,46 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+                 // --- SUPABASE LOGIC ---
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const loginForm = document.getElementById('login-form');
+        const messageDiv = document.getElementById('message');
+        const submitBtn = document.getElementById('submit-btn');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            
+            messageDiv.style.color = "#ffffff";
+            messageDiv.innerText = "> VERIFYING AUTHORIZATION...";
+            submitBtn.disabled = true;
+
+            try {
+                // Call the secure RPC function
+                const { data: isAuthorized, error: rpcError } = await supabaseClient
+                    .rpc('check_user_exists', { email_to_check: email });
+
+                if (rpcError) throw new Error("SYSTEM ERROR: UNABLE TO REACH GATEKEEPER");
+                if (!isAuthorized) throw new Error("ACCESS DENIED: EMAIL NOT RECOGNIZED");
+
+                // Trigger Magic Link
+                const { error: authError } = await supabaseClient.auth.signInWithOtp({
+                    email: email,
+                    options: { emailRedirectTo: window.location.origin + '/dashboard.html' }
+                });
+
+                if (authError) throw authError;
+
+                messageDiv.style.color = "#00ff00";
+                messageDiv.innerText = "> SUCCESS: MAGIC LINK TRANSMITTED TO INBOX";
+
+            } catch (err) {
+                messageDiv.style.color = "#ff0000";
+                messageDiv.innerText = "> " + err.message;
+                submitBtn.disabled = false;
+            }
         });
     </script>
 </body>
