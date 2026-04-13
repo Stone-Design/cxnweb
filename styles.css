@@ -398,13 +398,6 @@ body.solutions .cta-btn {
     font-size: 1.1rem;
     border-radius: 5px;
     cursor: pointer;
-    background-color: #888;
     transition: all 0.3s ease;
     text-decoration: none;
-    transition: cubic-bezier(0.075, 0.82, 0.165, 1);
-}
-
-.priv-btn:hover {
-    background-color: #3f0202;
-    color: #888;
 }
