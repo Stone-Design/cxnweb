@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDPR Policy | cellXion Ltd</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="gdpr">
+
+    <img src="images/x-png.png" id="custom-cursor" alt="Cursor">
+
+    <div id="canvas-container"></div>
+
+    <div id="ui-layer">
+        <header>
+            <div class="logo">
+                <img class="logo-img" src="images/x-png.png" alt="Logo">
+                <div>
+                    <span class="logo-text-main">CELLXION LTD</span>
+                    <p class="nav-secondary">Cellular Intelligence Solutions</p>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="solutions.html">QMTS</a></li>
+                    <li><a href="#" style="color: #ff0000;">GDPR</a></li>
+                    <li><a href="login.html">Log in</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="product-section">
+            <div class="product-info" style="max-width: 1000px;">
+                <h1>Privacy & GDPR Policy</h1>
+                
+                <h3 style="color: #d6250d; margin-top: 0; margin-bottom: 1rem; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">Information We Collect</h3>
+                <p>We are committed to protecting and respecting your privacy. Under the General Data Protection Regulation (GDPR), we only collect data that is strictly necessary for providing our telecommunications and telemetry services. This includes contact details, network identifiers, and standard system logs.</p>
+                
+                <h3 style="color: #d6250d; margin-top: 1.5rem; margin-bottom: 1rem; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">How We Use Your Data</h3>
+                <p>Your data is exclusively used to maintain secure connections, ensure route managing service (QRMS) functionality, and provide essential customer support. We do not sell your personal data to third parties. All internal processing is done in compliance with UK and EU data protection laws.</p>
+                
+                <h3 style="color: #d6250d; margin-top: 1.5rem; margin-bottom: 1rem; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">Data Security</h3>
+                <p>Security is at the core of our QRMS link protocol. We encrypt all telemetry and personal data using link-unique random keys. Your data is stored on secure servers with restricted access, meaning that even in the unlikely event of a breach, intercepted data remains cryptographically secure.</p>
+
+                <h3 style="color: #d6250d; margin-top: 1.5rem; margin-bottom: 1rem; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">Your Rights</h3>
+                <ul>
+                    <li>The right to be informed about how your data is being used.</li>
+                    <li>The right of access to your personal data.</li>
+                    <li>The right to rectification of inaccurate or incomplete data.</li>
+                    <li>The right to erasure (the "right to be forgotten").</li>
+                    <li>The right to restrict processing.</li>
+                    <li>The right to data portability.</li>
+                    <li>The right to object to automated decision-making and profiling.</li>
+                </ul>
+                
+                <p style="margin-top: 1.5rem;">If you have any questions regarding your data or wish to exercise your rights, please contact our Data Protection Officer at privacy@cellxion.net</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Three.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script>
+        // 1. Scene Setup
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.002);
+
+        // 2. Camera Setup
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 30;
+        camera.position.x = 0; // Centered to span the full screen width
+
+        // 3. Renderer Setup
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // 4. Create the 3D Telecom Network (Icosahedron Geometry)
+        const networkGroup = new THREE.Group();
+        scene.add(networkGroup);
+
+        // The Core Wireframe Globe
+        const geometry = new THREE.IcosahedronGeometry(15, 2);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0x454545, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.07
+        });
+        const globe = new THREE.Mesh(geometry, material);
+        networkGroup.add(globe);
+
+        // The Data Nodes (Particles)
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 800;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount * 3; i++) {
+            // Spread particles mostly around the globe radius
+            posArray[i] = (Math.random() - 0.5) * 40;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.15,
+            color: 0x383838,
+            transparent: true,
+            opacity: 0.5,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        networkGroup.add(particlesMesh);
+
+        // 5. Mouse Interaction
+        const customCursor = document.getElementById('custom-cursor');
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+
+        // Restore last known mouse position
+        const savedCursorX = sessionStorage.getItem('cursorX');
+        const savedCursorY = sessionStorage.getItem('cursorY');
+        if (savedCursorX && savedCursorY) {
+            customCursor.style.left = savedCursorX + 'px';
+            customCursor.style.top = savedCursorY + 'px';
+        } else {
+            customCursor.style.opacity = '0';
+        }
+
+        document.addEventListener('mousemove', (event) => {
+            customCursor.style.opacity = '1';
+            customCursor.style.left = event.clientX + 'px';
+            customCursor.style.top = event.clientY + 'px';
+            sessionStorage.setItem('cursorX', event.clientX);
+            sessionStorage.setItem('cursorY', event.clientY);
+            mouseX = (event.clientX - windowHalfX);
+            mouseY = (event.clientY - windowHalfY);
+        });
+
+        // 6. Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            // Base rotation
+            networkGroup.rotation.y += 0.002;
+            networkGroup.rotation.x += 0.001;
+            
+            // Particle wave effect
+            particlesMesh.rotation.y = -elapsedTime * 0.05;
+
+            // Smooth mouse interaction (Parallax effect)
+            targetX = mouseX * 0.001;
+            targetY = mouseY * 0.001;
+            
+            networkGroup.rotation.y += 0.05 * (targetX - networkGroup.rotation.y);
+            networkGroup.rotation.x += 0.05 * (targetY - networkGroup.rotation.x);
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // 7. Handle Window Resize
+        window.addEventListener('resize', () => {
+            // Background Canvas
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

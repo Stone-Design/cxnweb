@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QMTS Solutions | cellXion Ltd</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="solutions">
+
+    <img src="images/x-png.png" id="custom-cursor" alt="Cursor">
+
+    <div id="canvas-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none;"></div>
+
+    <div id="ui-layer">
+        <header>
+            <div class="logo">
+                <img class="logo-img" src="images/x-png.png" alt="Logo">
+                <div>
+                    <span class="logo-text-main">CELLXION LTD</span>
+                    <p class="nav-secondary">Cellular Intelligence Solutions</p>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#" style="color: #ff0000;">QMTS</a></li>
+                    <li><a href="gdpr.html">GDPR</a></li>
+                    <li><a href="login.html">Log in</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="product-section">
+            <div class="product-info">
+                <h1>QMTS</h1>
+                
+                <h3 style="color: #d6250d; margin-top: 0; margin-bottom: 1rem; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">Overview</h3>
+                
+                <p>This system allows several remote devices or hosts to securely communicate as though they are connected by a single IP network with uncomplicated routing. This is achieved through a central hub, the Quick Route Managing Service (QRMS), to which all clients connect. The QRMS is responsible for address allocation and routing between all the links as well as security functions.</p>
+                
+                <p>In cases where a device has more than one connection, the QRMS also evaluates and aggregates individual link quality to maximise throughput and availability. Connections to the QRMS can be made over any public or private TCP/IP network and are insensitive to intermediate NAT and firewall operations over which hosts may have no direct control.</p>
+                
+                <p>For security, the QRMS link protocol also encrypts all data using link-unique random keys agreed on a per-connection basis through Diffie-Hellman exchange (ephemeral keying). Optional authentication of both the client and QRMS can be performed by exchanging cryptographic hashes which incorporate pre-shared key material.</p>
+                
+                <p>Quad Modem Telemetry System (QMTS) devices are one type of QRMS client and are designed to utilise up to 4 wireless modems to provide exceptional link reliability and throughput when connecting to the central QRMS. The aggregate link may then be used by applications running either directly on the QMTS device, or by further hosts utilising the QMTS as an IP gateway on a sub-network.</p>
+                
+                <p>Other machines or servers may connect to the QRMS using provided software-only clients and services, available both for Windows and Linux.</p>
+                
+                <ul>
+                    <li>Input DC voltage between 9V and 28V.</li>
+                    <li>Nominal draw current 1A@12V.</li>
+                    <li>Temperature range -20°C to +55°C:
+                        <ul>
+                            <li>The unit will operate in an ambient of up to +25°C with no external heatsink.</li>
+                            <li>The unit will operate in an ambient of up to +35°C with an external passive heatsink.</li>
+                            <li>The unit will operate in an ambient of up to +55°C with an external actively cooled heatsink.</li>
+                        </ul>
+                    </li>
+                    <li>Up to four phone modules (4x SMA antennas).</li>
+                    <li>Each phone module will support the necessary bands and RATs for the target territory.</li>
+                    <li>Four SIM slots (micro-SIM size).</li>
+                    <li>Two Gigabit Ethernet ports (2 RJ45 rugged Ethernet connectors).</li>
+                    <li>Wi-Fi transceiver for wireless network connectivity (1x SMA antenna).</li>
+                    <li>GPS receiver for positional and time information (1x SMA antenna).</li>
+                    <li>GPIO for high/low detection of anti-tamper sensor (optional).</li>
+                    <li>I2C bus available for more complicated sensors such as temperature or battery monitoring (optional).</li>
+                </ul>
+                <br>
+                <a href="document/datasheet.pdf" class="cta-btn" download="datasheet.pdf">Download Datasheet</a>
+            </div>
+            <div class="product-visuals">
+                <div id="model-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Three.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    
+    <script>
+        // 1. Scene Setup
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.002);
+
+        // 2. Camera Setup
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 30;
+        camera.position.x = 0; // Centered to span the full screen width
+
+        // 3. Renderer Setup
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // 4. Create the 3D Telecom Network (Icosahedron Geometry)
+        const networkGroup = new THREE.Group();
+        scene.add(networkGroup);
+
+        // The Core Wireframe Globe
+        const geometry = new THREE.IcosahedronGeometry(15, 2);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0xff0000, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.07
+        });
+        const globe = new THREE.Mesh(geometry, material);
+        networkGroup.add(globe);
+
+        // The Data Nodes (Particles)
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 800;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount * 3; i++) {
+            // Spread particles mostly around the globe radius
+            posArray[i] = (Math.random() - 0.5) * 40;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.15,
+            color: 0xff3333,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        networkGroup.add(particlesMesh);
+
+        // 5. Mouse Interaction
+        const customCursor = document.getElementById('custom-cursor');
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+
+        // Restore last known mouse position
+        const savedCursorX = sessionStorage.getItem('cursorX');
+        const savedCursorY = sessionStorage.getItem('cursorY');
+        if (savedCursorX && savedCursorY) {
+            customCursor.style.left = savedCursorX + 'px';
+            customCursor.style.top = savedCursorY + 'px';
+        } else {
+            customCursor.style.opacity = '0';
+        }
+
+        document.addEventListener('mousemove', (event) => {
+            customCursor.style.opacity = '1';
+            customCursor.style.left = event.clientX + 'px';
+            customCursor.style.top = event.clientY + 'px';
+            sessionStorage.setItem('cursorX', event.clientX);
+            sessionStorage.setItem('cursorY', event.clientY);
+            mouseX = (event.clientX - windowHalfX);
+            mouseY = (event.clientY - windowHalfY);
+        });
+
+        // --- 5b. Product Model Setup ---
+        const modelContainer = document.getElementById('model-container');
+        const mWidth = modelContainer.clientWidth || 500;
+        const mHeight = modelContainer.clientHeight || 500;
+
+        const modelScene = new THREE.Scene();
+        
+        // Add lighting for the model
+        const ambientLight = new THREE.AmbientLight(0xffffff, 2); // Increased base brightness
+        modelScene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 3.5); // Stronger main light
+        directionalLight.position.set(10, 20, 10);
+        modelScene.add(directionalLight);
+
+        // Add a backlight to illuminate the dark side of the model as it rotates
+        const backLight = new THREE.DirectionalLight(0xffffff, 2);
+        backLight.position.set(-10, 5, -10);
+        modelScene.add(backLight);
+
+        const modelCamera = new THREE.PerspectiveCamera(45, mWidth / mHeight, 0.1, 100);
+        modelCamera.position.z = 12;
+
+        const modelRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        modelRenderer.setSize(mWidth, mHeight);
+        modelRenderer.setPixelRatio(window.devicePixelRatio);
+        modelContainer.appendChild(modelRenderer.domElement);
+
+        let productModelGroup;
+        const gltfLoader = new THREE.GLTFLoader();
+        gltfLoader.load(
+            'images/qmts.glb', 
+            (gltf) => {
+                const model = gltf.scene;
+                
+                // Auto-center the model geometry
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                model.position.sub(center);
+
+                // Wrap the model in a group to apply the base tilt and rotation safely
+                productModelGroup = new THREE.Group();
+                productModelGroup.add(model);
+                productModelGroup.rotation.x = 15 * (Math.PI / 180); // 15-degree tilt
+
+                // Auto-scale to roughly fit the viewport
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                if (maxDim > 0) {
+                    productModelGroup.scale.setScalar(8 / maxDim); 
+                }
+
+                modelScene.add(productModelGroup);
+            },
+            undefined,
+            (error) => {
+                console.error('Error loading model:', error);
+                modelContainer.innerHTML = '<div class="model-error">Error loading 3D model.<br><br>If viewing from your desktop, you must use a local web server (like VS Code Live Server) to bypass browser security restrictions.</div>';
+            }
+        );
+
+        // 6. Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            // Base rotation
+            networkGroup.rotation.y += 0.002;
+            networkGroup.rotation.x += 0.001;
+            
+            // Particle wave effect
+            particlesMesh.rotation.y = -elapsedTime * 0.05;
+
+            // Smooth mouse interaction (Parallax effect)
+            targetX = mouseX * 0.001;
+            targetY = mouseY * 0.001;
+            
+            networkGroup.rotation.y += 0.05 * (targetX - networkGroup.rotation.y);
+            networkGroup.rotation.x += 0.05 * (targetY - networkGroup.rotation.x);
+
+            renderer.render(scene, camera);
+
+            // Product model specific animations
+            if (productModelGroup) {
+                productModelGroup.rotation.y += 0.005; // Slow 360-degree rotation
+            }
+            modelRenderer.render(modelScene, modelCamera);
+        }
+
+        animate();
+
+        // 7. Handle Window Resize
+        window.addEventListener('resize', () => {
+            // Background Canvas
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            // Product Model Canvas
+            modelCamera.aspect = modelContainer.clientWidth / modelContainer.clientHeight;
+            modelCamera.updateProjectionMatrix();
+            modelRenderer.setSize(modelContainer.clientWidth, modelContainer.clientHeight);
+        });
+    </script>
+</body>
+</html>

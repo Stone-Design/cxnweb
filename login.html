@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in | cellXion Ltd</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Login Modal Styles */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0, 0, 0, 0.75); 
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            margin: 10% auto; 
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #fff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body class="solutions">
+
+    <img src="images/x-png.png" id="custom-cursor" alt="Cursor">
+
+    <div id="canvas-container"></div>
+
+    <div id="ui-layer">
+        <header>
+            <div class="logo">
+                <img class="logo-img" src="images/x-png.png" alt="Logo">
+                <div>
+                    <span class="logo-text-main">CELLXION LTD</span>
+                    <p class="nav-secondary">Cellular Intelligence Solutions</p>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="solutions.html">QMTS</a></li>
+                    <li><a href="gdpr.html">GDPR</a></li>
+                    <li><a href="#" style="color: #ff0000;">Log in</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="login-container">
+            <div class="login-card">
+                <img class="login-logo" src="images/x-png.png" alt="Logo">
+                <h2>CELLXION LTD</h2>
+                <p>Enter details to request temporary Log-in credentials</p>
+                
+                <form action="#" method="POST">
+                    <div class="form-group">
+                        <label for="company">Company</label>
+                        <input type="text" id="company" name="company" required placeholder="Enter company name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="Enter email address">
+                    </div>
+                    
+                    <button type="submit" class="cta-btn login-btn">Send Request</button>
+                    <br>
+                    <a class="cred-link" id="openLoginModal" href="#">Already have credentials? Click Here.</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <!-- Reusing the existing "login-card" class to maintain styling consistency -->
+        <div class="modal-content login-card">
+            <span class="close-btn" id="closeLoginModal">&times;</span>
+            <h2>Log In</h2>
+            <p>Enter your credentials to access your account.</p>
+            
+            <form action="#" method="POST">
+                <div class="form-group">
+                    <label for="login-username">Email / Username</label>
+                    <input type="text" id="login-username" name="login-username" required placeholder="Enter email or username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="login-password" required placeholder="Enter password">
+                </div>
+                
+                <button type="submit" class="cta-btn login-btn">Log In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Load Three.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script>
+        // 1. Scene Setup
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.002);
+
+        // 2. Camera Setup
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 30;
+        camera.position.x = 0; // Centered to span the full screen width
+
+        // 3. Renderer Setup
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // 4. Create the 3D Telecom Network (Icosahedron Geometry)
+        const networkGroup = new THREE.Group();
+        scene.add(networkGroup);
+
+        // The Core Wireframe Globe
+        const geometry = new THREE.IcosahedronGeometry(15, 2);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0xff0000, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.07
+        });
+        const globe = new THREE.Mesh(geometry, material);
+        networkGroup.add(globe);
+
+        // The Data Nodes (Particles)
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 800;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 40;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.15, color: 0xff3333, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        networkGroup.add(particlesMesh);
+
+        // Custom Cursor Tracking
+        const customCursor = document.getElementById('custom-cursor');
+
+        // Restore last known mouse position
+        const savedCursorX = sessionStorage.getItem('cursorX');
+        const savedCursorY = sessionStorage.getItem('cursorY');
+        if (savedCursorX && savedCursorY) {
+            customCursor.style.left = savedCursorX + 'px';
+            customCursor.style.top = savedCursorY + 'px';
+        } else {
+            customCursor.style.opacity = '0';
+        }
+
+        document.addEventListener('mousemove', (event) => {
+            customCursor.style.opacity = '1';
+            customCursor.style.left = event.clientX + 'px';
+            customCursor.style.top = event.clientY + 'px';
+            sessionStorage.setItem('cursorX', event.clientX);
+            sessionStorage.setItem('cursorY', event.clientY);
+        });
+
+        // Modal Interaction Logic
+        const loginModal = document.getElementById('loginModal');
+        const openModalBtn = document.getElementById('openLoginModal');
+        const closeModalBtn = document.getElementById('closeLoginModal');
+
+        openModalBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.style.display = 'block';
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
+        });
+
+        // 5. Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+            networkGroup.rotation.y += 0.002;
+            networkGroup.rotation.x += 0.001;
+            particlesMesh.rotation.y = -elapsedTime * 0.05;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // 6. Handle Window Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

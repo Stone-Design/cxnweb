@@ -1,0 +1,393 @@
+/* Common Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body.home {
+    overflow: hidden; /* Prevent scrolling, keep it a locked 3D view */
+    background-color: #050505;
+    color: #ffffff;
+}
+
+body.solutions {
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    background-color: #f8f8f8;
+    color: #252525;
+}
+
+body.gdpr {
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    background-color: #e2e2e2;
+    color: #1b1b1b;
+}
+
+/* 3D Canvas Background */
+#canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* UI Overlay */
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none; /* Let clicks pass through to 3D canvas where needed */
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: auto;
+}
+
+body.home header {
+    padding: 1rem 5rem;
+}
+
+body.solutions header {
+    padding: 1rem 5rem 3rem;
+}
+
+body.gdpr header {
+    padding: 1rem 5rem;
+}
+
+.logo {
+    padding-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #d6250d;
+    text-shadow: 0 0 10px rgba(250, 29, 29, 0.521);
+}
+
+.logo-text-main {
+    display: block;
+    line-height: 1; /* This reduces the line-height of the main logo text */
+}
+
+.logo-img {
+    width: 70px;
+}
+
+.nav-secondary { 
+    font-size: 12.6px;
+    margin-top: -1px; 
+    margin-bottom: 0;
+}
+
+nav {
+    position: fixed;
+    right: 5rem;
+    z-index: 100;
+    pointer-events: auto;
+}
+
+body.home nav {
+    top: 3.5rem; /* Aligns with the 2rem padding on the home page header */
+}
+
+body.solutions nav, body.gdpr nav {
+    top: 3.5rem; /* Aligns with the 1rem padding on the other pages */
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li a {
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 700;
+    transition: color 0.3s ease;
+    padding-left: 2rem;
+    text-transform: uppercase;
+}
+
+body.home nav ul li a {
+    color: #fff;
+}
+
+body.solutions nav ul li a {
+    color: #252525;
+}
+
+body.gdpr nav ul li a {
+    color: #252525;
+}
+
+nav ul li a:hover {
+    color: #ff0000;
+}
+
+.cta-btn {
+    padding: 15px 30px;
+    color: #fff;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+body.home .cta-btn {
+    background: rgba(255, 0, 0, 0.2);
+    border: 1px solid #ff0000;
+}
+
+body.solutions .cta-btn {
+    background: #d6250d;
+    border: 1px solid #860909;
+}
+
+.cta-btn:hover {
+    background: rgb(236, 12, 12);
+    box-shadow: 0 0 20px rgba(236, 12, 12, 0.6);
+}
+
+/* Home Page Specific */
+.hero {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0 5rem;
+    pointer-events: auto;
+}
+
+.hero h1 {
+    font-size: 4rem;
+    margin: 0 0 1rem 0;
+    max-width: 600px;
+    line-height: 1.2;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin: 0 0 2rem 0;
+    max-width: 500px;
+    color: #cccccc;
+}
+
+.footer-info {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #888;
+    pointer-events: auto;
+}
+
+.link {
+    text-decoration: none;
+    color: #fff;
+}
+
+/* Solutions Page Specific */
+.product-section {
+    flex-grow: 1;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    padding: 0 5rem 5rem;
+    pointer-events: auto;
+    gap: 5rem;
+}
+
+.product-info {
+    flex: 1;
+    max-width: 900px;
+}
+
+.product-info h1 {
+    font-size: 3rem;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+    color: #d6250d;
+    text-shadow: 0 0 10px rgba(250, 29, 29, 0.3);
+}
+
+.product-info p {
+    font-size: 1rem;
+    margin: 0 0 1.5rem 0;
+    color: #252525;
+    line-height: 1.6;
+}
+
+.product-info ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2.5rem;
+}
+
+.product-info ul li {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    color: #252525;
+    position: relative;
+    padding-left: 20px;
+}
+
+.product-info ul li::before {
+    content: "■";
+    color: #d6250d;
+    font-size: 0.8rem;
+    position: absolute;
+    left: 0;
+    top: 6px;
+}
+
+.product-info ul ul {
+    margin-top: 0.8rem;
+    margin-bottom: 0;
+}
+
+.product-visuals {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: flex-end; /* Align content to the right side of the column */
+    justify-content: start;
+    position: fixed;
+    right: 5rem; /* Lock it to the right side, matching page padding */
+    width: 45%; /* Retain its width since fixed removes it from normal flow */
+    top: 50%;
+    transform: translateY(-50%); /* Perfectly center it vertically */
+    align-self: flex-start;
+}
+
+#model-container {
+    width: 120%; /* Widen the canvas to prevent side clipping */
+    height: 650px; /* Increase height to prevent top/bottom clipping */
+    max-width: 1000px;
+    position: relative;
+    cursor: grab;
+    margin-right: -10%; /* Shift the extra width to the right */
+}
+
+.model-error {
+    color: #d6250d;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    transform: translateY(-50%);
+    font-weight: bold;
+}
+
+/* Login Page Specific */
+.login-container {
+    /* flex-grow: 1; */
+    margin-top: 3.5rem;
+    display: flex;
+    justify-content: center;
+    height: 600px;
+    /* align-items: center; */
+    pointer-events: auto;
+    padding: 0 2rem;
+}
+
+.login-card {
+    background: #ffffff;
+    padding: 3rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-logo {
+    width: 100%;
+    max-width: 50px;
+    margin-bottom: 1.5rem;
+}
+
+.login-card h2 {
+    margin-top: 0;
+    margin-bottom: 2rem;
+    color: #d6250d;
+    font-size: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #252525;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-sizing: border-box; /* Ensures padding stays within width */
+    font-family: inherit;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #d6250d;
+    box-shadow: 0 0 5px rgba(214, 37, 13, 0.3);
+}
+
+.login-btn {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.cred-link { 
+    position: relative;
+    top: 20px;
+}
+
+/* Hide the default system cursor everywhere */
+* {
+    cursor: none !important;
+}
+
+/* Style the custom image cursor */
+#custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 40px;
+    pointer-events: none; /* Ensures clicks pass through the image to buttons/links */
+    z-index: 999999; /* Keeps the cursor above all 3D canvases and UI layers */
+    transform: translate(-50%, -50%); /* Centers the image exactly on the mouse coordinates */
+}
