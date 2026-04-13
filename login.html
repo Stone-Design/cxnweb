@@ -3,20 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | cellXion Ltd</title>
+    <title>Log in | cellXion Ltd</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // Replace with your actual credentials
         const SUPABASE_URL = 'https://doyacbaoeytnqivpsels.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_gK-xj6a23FK1rUfAUf0R6Q_BCeji8aE';
     </script>
+    <style>
+        /* Login Modal Styles */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0, 0, 0, 0.75); 
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            margin: 10% auto; 
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #fff;
+            text-decoration: none;
+        }
+    </style>
 </head>
-<body class="login-page">
+<body class="solutions">
 
     <img src="images/x-png.png" id="custom-cursor" alt="Cursor">
 
-    <div id="canvas-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none;"></div>
+    <div id="canvas-container"></div>
 
     <div id="ui-layer">
         <header>
@@ -32,34 +64,34 @@
                     <li><a href="index.html">Home</a></li>
                     <li><a href="solutions.html">QMTS</a></li>
                     <li><a href="gdpr.html">GDPR</a></li>
-                    <li><a href="login.html" style="color: #ff0000;">Log in</a></li>
+                    <li><a href="#" style="color: #ff0000;">Log in</a></li>
                 </ul>
             </nav>
         </header>
 
-        <main class="login-main">
-            <div class="login-container">
-                <div class="login-header">
-                    <img src="images/x-png.png" alt="Login Icon" style="width: 50px; margin-bottom: 1rem;">
-                    <h1>Member Access</h1>
-                    <p>Enter your registered email to receive a secure login link valid for 24 hours.</p>
-                </div>
+        <div class="login-container">
+            <div class="login-card">
+                <img class="login-logo" src="images/x-png.png" alt="Logo">
+                <h2>CELLXION LTD</h2>
+                <p>Enter details to request temporary Log-in credentials</p>
                 
-                <form id="login-form">
+                <form action="#" method="POST">
                     <div class="form-group">
-                        <input type="email" id="email" placeholder="Email Address" required autocomplete="email">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="Enter email address">
                     </div>
-                    <button type="submit" id="submit-btn" class="cta-btn login-btn">Send Magic Link</button>
+                    
+                    <button type="submit" class="cta-btn login-btn">Send Request</button>
                 </form>
-                
-                <div id="message" style="margin-top: 1.5rem; font-family: monospace; font-size: 0.8rem; letter-spacing: 1px; min-height: 1.2em; text-transform: uppercase;"></div>
             </div>
-        </main>
+        </div>
     </div>
 
+    <!-- Load Three.js from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
     <script>
-        // --- 1. SUPABASE LOGIC ---
+         // --- SUPABASE LOGIC ---
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const loginForm = document.getElementById('login-form');
         const messageDiv = document.getElementById('message');
@@ -99,69 +131,108 @@
             }
         });
 
-        // --- 2. RESTORED THREE.JS (From login_old.html) ---
+        // 1. Scene Setup
         const scene = new THREE.Scene();
         scene.fog = new THREE.FogExp2(0x050505, 0.002);
 
+        // 2. Camera Setup
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.z = 30;
+        camera.position.x = 0; // Centered to span the full screen width
 
+        // 3. Renderer Setup
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(window.devicePixelRatio);
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
+        // 4. Create the 3D Telecom Network (Icosahedron Geometry)
         const networkGroup = new THREE.Group();
         scene.add(networkGroup);
 
-        // Particle System
+        // The Core Wireframe Globe
+        const geometry = new THREE.IcosahedronGeometry(15, 2);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0xff0000, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.07
+        });
+        const globe = new THREE.Mesh(geometry, material);
+        networkGroup.add(globe);
+
+        // The Data Nodes (Particles)
         const particlesGeometry = new THREE.BufferGeometry();
         const particlesCount = 800;
         const posArray = new Float32Array(particlesCount * 3);
+
         for(let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 50;
+            posArray[i] = (Math.random() - 0.5) * 40;
         }
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMesh = new THREE.Points(particlesGeometry, new THREE.PointsMaterial({
-            size: 0.1, color: 0xff0000, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending
-        }));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.15, color: 0xff3333, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         networkGroup.add(particlesMesh);
 
-        // Globe
-        const globe = new THREE.Mesh(
-            new THREE.IcosahedronGeometry(15, 2),
-            new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true, transparent: true, opacity: 0.1 })
-        );
-        networkGroup.add(globe);
+        // Custom Cursor Tracking
+        const customCursor = document.getElementById('custom-cursor');
 
-        // Animation Loop
-        const clock = new THREE.Clock();
-        let mouseX = 0, mouseY = 0;
+        // Restore last known mouse position
+        const savedCursorX = sessionStorage.getItem('cursorX');
+        const savedCursorY = sessionStorage.getItem('cursorY');
+        if (savedCursorX && savedCursorY) {
+            customCursor.style.left = savedCursorX + 'px';
+            customCursor.style.top = savedCursorY + 'px';
+        } else {
+            customCursor.style.opacity = '0';
+        }
 
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX - window.innerWidth / 2) * 0.05;
-            mouseY = (e.clientY - window.innerHeight / 2) * 0.05;
-            // Custom Cursor
-            const cursor = document.getElementById('custom-cursor');
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
+        document.addEventListener('mousemove', (event) => {
+            customCursor.style.opacity = '1';
+            customCursor.style.left = event.clientX + 'px';
+            customCursor.style.top = event.clientY + 'px';
+            sessionStorage.setItem('cursorX', event.clientX);
+            sessionStorage.setItem('cursorY', event.clientY);
         });
+
+        // Modal Interaction Logic
+        const loginModal = document.getElementById('loginModal');
+        const openModalBtn = document.getElementById('openLoginModal');
+        const closeModalBtn = document.getElementById('closeLoginModal');
+
+        openModalBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.style.display = 'block';
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
+        });
+
+        // 5. Animation Loop
+        const clock = new THREE.Clock();
 
         function animate() {
             requestAnimationFrame(animate);
             const elapsedTime = clock.getElapsedTime();
-
-            networkGroup.rotation.y += 0.001;
-            networkGroup.position.x += (mouseX * 0.01 - networkGroup.position.x) * 0.05;
-            networkGroup.position.y += (-mouseY * 0.01 - networkGroup.position.y) * 0.05;
-
-            particlesMesh.rotation.y = elapsedTime * 0.05;
-            globe.scale.setScalar(1 + Math.sin(elapsedTime * 0.5) * 0.05); // Pulsing effect
-
+            networkGroup.rotation.y += 0.002;
+            networkGroup.rotation.x += 0.001;
+            particlesMesh.rotation.y = -elapsedTime * 0.05;
             renderer.render(scene, camera);
         }
         animate();
 
+        // 6. Handle Window Resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
