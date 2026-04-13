@@ -50,16 +50,17 @@
             </nav>
         </header>
 
+        <h1>PRIVATE PAGE</h1>
+
         <main class="product-section">
-            <h1>PRIVATE PAGE</h1>
             <div class="product-info">
                 <h1>Member Dashboard</h1>
                 <p style="color: #00ff00; font-family: monospace;">[ ACCESS GRANTED: SESSION ACTIVE ]</p>
                 
-                <h3 style="color: #d6250d; margin-top: 2rem; text-transform: uppercase;">Private Resources</h3>
+                <h3 style="color: #d6250d; margin-top: 1.5rem; text-transform: uppercase;">Private Resources</h3>
                 <p>Welcome to the secure area. Below you will find sensitive documentation and internal tools not available to the public.</p>
                 
-                <div class="private-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 2rem;">
+                <div class="private-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 1.5rem;">
                     <div style="border: 1px solid #333; padding: 20px; background: rgba(255,0,0,0.05);">
                         <h4>Internal Schematics</h4>
                         <p>Detailed hardware diagrams for QMTS V4.3.1.</p>
@@ -75,7 +76,6 @@
         </main>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // 3. Logout Logic
         document.getElementById('logout-link').addEventListener('click', async (e) => {
@@ -83,34 +83,6 @@
             await supabaseClient.auth.signOut();
             window.location.href = 'index.html';
         });
-
-        // 4. Visuals (Subtle variations for the private area)
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-        // A slightly more complex wireframe for the private area
-        const geometry = new THREE.IcosahedronGeometry(15, 3);
-        const material = new THREE.MeshBasicMaterial({ 
-            color: 0xff0000, 
-            wireframe: true, 
-            transparent: true, 
-            opacity: 0.15 
-        });
-        const sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
-
-        camera.position.z = 30;
-
-        function animate() {
-            requestAnimationFrame(animate);
-            sphere.rotation.y += 0.001;
-            sphere.rotation.x += 0.0005;
-            renderer.render(scene, camera);
-        }
-        animate();
 
         // Cursor logic
         const cursor = document.getElementById('custom-cursor');
