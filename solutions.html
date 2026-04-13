@@ -70,116 +70,66 @@
                 <a href="document/datasheet.pdf" class="cta-btn" download="datasheet.pdf">Download Datasheet</a>
             </div>
             <div class="product-visuals">
-                <div id="model-container"></div>
+                <div id="model-container">
+                    <div id="loading-spinner" style="color: #ff0000; font-family: monospace; text-align: center; margin-top: 40%;">INITIALISING 3D MODEL...</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Load Three.js from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
     
     <script>
-        // 1. Scene Setup
+        // --- 1. Background Network Setup ---
         const scene = new THREE.Scene();
         scene.fog = new THREE.FogExp2(0x050505, 0.002);
 
-        // 2. Camera Setup
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.z = 30;
-        camera.position.x = 0; // Centered to span the full screen width
 
-        // 3. Renderer Setup
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // 4. Create the 3D Telecom Network (Icosahedron Geometry)
         const networkGroup = new THREE.Group();
         scene.add(networkGroup);
 
-        // The Core Wireframe Globe
-        const geometry = new THREE.IcosahedronGeometry(15, 2);
-        const material = new THREE.MeshBasicMaterial({ 
-            color: 0xff0000, 
-            wireframe: true,
-            transparent: true,
-            opacity: 0.07
-        });
-        const globe = new THREE.Mesh(geometry, material);
+        // Globe
+        const globe = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(15, 2),
+            new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true, transparent: true, opacity: 0.07 })
+        );
         networkGroup.add(globe);
 
-        // The Data Nodes (Particles)
+        // Particles
         const particlesGeometry = new THREE.BufferGeometry();
         const particlesCount = 800;
         const posArray = new Float32Array(particlesCount * 3);
-
         for(let i = 0; i < particlesCount * 3; i++) {
-            // Spread particles mostly around the globe radius
             posArray[i] = (Math.random() - 0.5) * 40;
         }
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.15,
-            color: 0xff3333,
-            transparent: true,
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending
-        });
-        
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        const particlesMesh = new THREE.Points(particlesGeometry, new THREE.PointsMaterial({
+            size: 0.15, color: 0xff3333, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending
+        }));
         networkGroup.add(particlesMesh);
 
-        // 5. Mouse Interaction
-        const customCursor = document.getElementById('custom-cursor');
-        let mouseX = 0;
-        let mouseY = 0;
-        let targetX = 0;
-        let targetY = 0;
-        const windowHalfX = window.innerWidth / 2;
-        const windowHalfY = window.innerHeight / 2;
-
-        // Restore last known mouse position
-        const savedCursorX = sessionStorage.getItem('cursorX');
-        const savedCursorY = sessionStorage.getItem('cursorY');
-        if (savedCursorX && savedCursorY) {
-            customCursor.style.left = savedCursorX + 'px';
-            customCursor.style.top = savedCursorY + 'px';
-        } else {
-            customCursor.style.opacity = '0';
-        }
-
-        document.addEventListener('mousemove', (event) => {
-            customCursor.style.opacity = '1';
-            customCursor.style.left = event.clientX + 'px';
-            customCursor.style.top = event.clientY + 'px';
-            sessionStorage.setItem('cursorX', event.clientX);
-            sessionStorage.setItem('cursorY', event.clientY);
-            mouseX = (event.clientX - windowHalfX);
-            mouseY = (event.clientY - windowHalfY);
-        });
-
-        // --- 5b. Product Model Setup ---
+        // --- 2. Product Model (Draco) ---
         const modelContainer = document.getElementById('model-container');
         const mWidth = modelContainer.clientWidth || 500;
         const mHeight = modelContainer.clientHeight || 500;
 
         const modelScene = new THREE.Scene();
-        
-        // Add lighting for the model
-        const ambientLight = new THREE.AmbientLight(0xffffff, 2); // Increased base brightness
-        modelScene.add(ambientLight);
-        
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 3.5); // Stronger main light
-        directionalLight.position.set(10, 20, 10);
-        modelScene.add(directionalLight);
-
-        // Add a backlight to illuminate the dark side of the model as it rotates
-        const backLight = new THREE.DirectionalLight(0xffffff, 2);
-        backLight.position.set(-10, 5, -10);
-        modelScene.add(backLight);
+        modelScene.add(new THREE.AmbientLight(0xffffff, 2));
+        const dLight = new THREE.DirectionalLight(0xffffff, 3.5);
+        dLight.position.set(10, 20, 10);
+        modelScene.add(dLight);
+        const bLight = new THREE.DirectionalLight(0xffffff, 2);
+        bLight.position.set(-10, 5, -10);
+        modelScene.add(bLight);
 
         const modelCamera = new THREE.PerspectiveCamera(45, mWidth / mHeight, 0.1, 100);
         modelCamera.position.z = 12;
@@ -190,78 +140,73 @@
         modelContainer.appendChild(modelRenderer.domElement);
 
         let productModelGroup;
+
+        // Draco Loader setup
+        const dracoLoader = new THREE.DRACOLoader();
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.3/');
         const gltfLoader = new THREE.GLTFLoader();
-        gltfLoader.load(
-            'images/qmts.glb', 
-            (gltf) => {
-                const model = gltf.scene;
-                
-                // Auto-center the model geometry
-                const box = new THREE.Box3().setFromObject(model);
-                const center = box.getCenter(new THREE.Vector3());
-                model.position.sub(center);
+        gltfLoader.setDRACOLoader(dracoLoader);
 
-                // Wrap the model in a group to apply the base tilt and rotation safely
-                productModelGroup = new THREE.Group();
-                productModelGroup.add(model);
-                productModelGroup.rotation.x = 15 * (Math.PI / 180); // 15-degree tilt
+        gltfLoader.load('images/qmts-v1.glb', (gltf) => {
+            document.getElementById('loading-spinner').style.display = 'none';
+            const model = gltf.scene;
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            model.position.sub(center);
 
-                // Auto-scale to roughly fit the viewport
-                const size = box.getSize(new THREE.Vector3());
-                const maxDim = Math.max(size.x, size.y, size.z);
-                if (maxDim > 0) {
-                    productModelGroup.scale.setScalar(8 / maxDim); 
-                }
+            productModelGroup = new THREE.Group();
+            productModelGroup.add(model);
+            productModelGroup.rotation.x = 15 * (Math.PI / 180);
 
-                modelScene.add(productModelGroup);
-            },
-            undefined,
-            (error) => {
-                console.error('Error loading model:', error);
-                modelContainer.innerHTML = '<div class="model-error">Error loading 3D model.<br><br>If viewing from your desktop, you must use a local web server (like VS Code Live Server) to bypass browser security restrictions.</div>';
-            }
-        );
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            if (maxDim > 0) productModelGroup.scale.setScalar(8 / maxDim); 
+            modelScene.add(productModelGroup);
+        });
 
-        // 6. Animation Loop
+        // --- 3. Interaction & Animation ---
+        const customCursor = document.getElementById('custom-cursor');
+        let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
         const clock = new THREE.Clock();
+
+        document.addEventListener('mousemove', (e) => {
+            customCursor.style.opacity = '1';
+            customCursor.style.left = e.clientX + 'px';
+            customCursor.style.top = e.clientY + 'px';
+            mouseX = (e.clientX - window.innerWidth / 2);
+            mouseY = (e.clientY - window.innerHeight / 2);
+        });
 
         function animate() {
             requestAnimationFrame(animate);
             const elapsedTime = clock.getElapsedTime();
 
-            // Base rotation
+            // 1. Background rotation (Always spinning)
             networkGroup.rotation.y += 0.002;
             networkGroup.rotation.x += 0.001;
-            
-            // Particle wave effect
             particlesMesh.rotation.y = -elapsedTime * 0.05;
 
-            // Smooth mouse interaction (Parallax effect)
+            // 2. Parallax (Added on top of base rotation)
             targetX = mouseX * 0.001;
             targetY = mouseY * 0.001;
-            
-            networkGroup.rotation.y += 0.05 * (targetX - networkGroup.rotation.y);
-            networkGroup.rotation.x += 0.05 * (targetY - networkGroup.rotation.x);
+            networkGroup.rotation.y += 0.05 * (targetX - (networkGroup.rotation.y % (Math.PI * 2)));
+            networkGroup.rotation.x += 0.05 * (targetY - (networkGroup.rotation.x % (Math.PI * 2)));
 
             renderer.render(scene, camera);
 
-            // Product model specific animations
+            // 3. Product Model rotation
             if (productModelGroup) {
-                productModelGroup.rotation.y += 0.005; // Slow 360-degree rotation
+                productModelGroup.rotation.y += 0.005;
             }
             modelRenderer.render(modelScene, modelCamera);
         }
 
         animate();
 
-        // 7. Handle Window Resize
         window.addEventListener('resize', () => {
-            // Background Canvas
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-
-            // Product Model Canvas
             modelCamera.aspect = modelContainer.clientWidth / modelContainer.clientHeight;
             modelCamera.updateProjectionMatrix();
             modelRenderer.setSize(modelContainer.clientWidth, modelContainer.clientHeight);
