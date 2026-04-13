@@ -156,6 +156,8 @@
             e.preventDefault();
             const email = document.getElementById('email').value.trim().toLowerCase();
             
+            console.log("Form sent!");
+
             messageDiv.style.color = "#ffffff";
             messageDiv.innerText = "> VERIFYING AUTHORIZATION...";
             submitBtn.disabled = true;
