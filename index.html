@@ -3,166 +3,405 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cellXion Ltd | Global Telecommunications</title>
-    <link rel="preload" href="images/qmts-v1.glb" as="fetch" crossorigin="anonymous">
-    <link rel="stylesheet" href="styles.css">
+    <title>cellXion Ltd</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:   #06060A;
+            --r:    #C8170D;
+            --w:    #F0EBE4;
+            --g:    #5A5550;
+            --bdr:  rgba(255,255,255,0.06);
+        }
+
+        html, body { height: 100%; }
+
+        body {
+            background: var(--bg);
+            color: var(--w);
+            font-family: 'Barlow', sans-serif;
+            font-weight: 300;
+            cursor: none;
+            overflow: hidden;
+        }
+
+        /* ── CURSOR ── */
+        #cur {
+            position: fixed;
+            width: 9px; height: 9px;
+            border: 1px solid var(--r);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 999;
+            transform: translate(-50%, -50%);
+            transition: width .22s, height .22s, border-color .22s;
+        }
+        #cur2 {
+            position: fixed;
+            width: 3px; height: 3px;
+            background: var(--r);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 998;
+            transform: translate(-50%, -50%);
+        }
+        body.hov #cur { width: 40px; height: 40px; border-color: rgba(200,23,13,.4); }
+
+        /* ── GRAIN ── */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 50;
+            opacity: .032;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        /* ── CANVAS ── */
+        #bg { position: fixed; inset: 0; z-index: 0; }
+
+        /* ── LAYOUT ── */
+        .shell {
+            position: relative; z-index: 10;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        /* ── SHARED PANEL BASE ── */
+        .panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 4rem;
+            text-decoration: none;
+            color: var(--w);
+            overflow: hidden;
+            transition: background .5s ease;
+        }
+        .panel::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,.45);
+            transition: background .5s ease;
+            z-index: 0;
+        }
+        .panel:hover::before { background: rgba(0,0,0,.25); }
+
+        /* ── DIVIDER ── */
+        .panel-left  { border-right: 1px solid var(--bdr); }
+
+        /* ── RIGHT PANEL — text flush right ── */
+        .panel-right {
+            align-items: flex-end;
+            text-align: right;
+        }
+        .panel-right .v-tag {
+            flex-direction: row-reverse;
+        }
+        .panel-right .v-cta {
+            flex-direction: row-reverse;
+        }
+
+        /* ── VERSION TAG ── */
+        .v-tag {
+            position: relative; z-index: 1;
+            font-family: 'Barlow', sans-serif;
+            font-size: .58rem;
+            letter-spacing: .32em;
+            text-transform: uppercase;
+            color: var(--r);
+            margin-bottom: 1.6rem;
+            display: flex; align-items: center; gap: .75rem;
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity .7s ease, transform .7s ease;
+        }
+        .v-tag::before { content: ''; display: block; width: 22px; height: 1px; background: var(--r); }
+
+        /* ── HEADING ── */
+        .v-heading {
+            position: relative; z-index: 1;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: clamp(3.5rem, 6vw, 6.5rem);
+            line-height: .9;
+            letter-spacing: -.02em;
+            margin-bottom: 1.8rem;
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity .75s ease .1s, transform .75s ease .1s;
+        }
+        .v-heading em { font-style: italic; color: rgba(240,235,228,.3); }
+
+        /* ── LOGO ── */
+        .logo { width: 80px;}
+
+        /* ── DESC ── */
+        .v-desc {
+            position: relative; z-index: 1;
+            font-size: .8rem;
+            line-height: 1.85;
+            color: rgba(240,235,228,.5);
+            max-width: 36ch;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity .7s ease .2s, transform .7s ease .2s;
+        }
+
+        /* ── CTA ── */
+        .v-cta {
+            position: relative; z-index: 1;
+            display: inline-flex; align-items: center; gap: .9rem;
+            font-size: .6rem;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--w);
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity .7s ease .32s, transform .7s ease .32s, gap .35s ease;
+        }
+        .v-cta-line {
+            display: block; width: 32px; height: 1px;
+            background: var(--r);
+            transition: width .4s ease;
+        }
+        .panel:hover .v-cta { gap: 1.4rem; }
+        .panel:hover .v-cta-line { width: 58px; }
+
+        /* ── LOADED STATE ── */
+        .panel.loaded .v-tag,
+        .panel.loaded .v-heading,
+        .panel.loaded .v-desc,
+        .panel.loaded .v-cta { opacity: 1; transform: translateY(0); }
+
+        /* ── CENTRE LOGO ── */
+        .centre-logo {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            display: flex; flex-direction: column; align-items: center; gap: .7rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .8s ease .5s;
+        }
+        .centre-logo.show { opacity: 1; }
+        .cl-x svg { width: 32px; height: 32px; display: block; }
+        .cl-name {
+            font-family: 'Barlow', sans-serif;
+            font-size: .58rem; letter-spacing: .3em;
+            text-transform: uppercase;
+            color: rgba(240,235,228,.55);
+            white-space: nowrap;
+        }
+        .cl-line {
+            /* vertical divider reinforcing the split */
+            position: fixed;
+            top: 0; left: 50%;
+            width: 1px; height: 100vh;
+            background: var(--bdr);
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        /* ── TOP BAR ── */
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            z-index: 30;
+            padding: 2rem 3.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            pointer-events: none;
+        }
+        .tb-brand {
+            font-family: 'Barlow', sans-serif;
+            font-size: .6rem; letter-spacing: .26em;
+            text-transform: uppercase;
+            color: rgba(240,235,228,.4);
+        }
+        .tb-hint {
+            font-family: 'Barlow', sans-serif;
+            font-size: .56rem; letter-spacing: .2em;
+            text-transform: uppercase;
+            color: rgba(240,235,228,.25);
+        }
+
+        /* ── HOVER ACCENT GLOW ── */
+        .panel-left  .glow {
+            position: absolute; bottom: -80px; left: -80px;
+            width: 360px; height: 360px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(200,23,13,.18) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
+            opacity: 0; transition: opacity .6s ease;
+        }
+        .panel-right .glow {
+            position: absolute; bottom: -80px; right: -80px;
+            width: 360px; height: 360px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(200,23,13,.14) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
+            opacity: 0; transition: opacity .6s ease;
+        }
+        .panel:hover .glow { opacity: 1; }
+    </style>
 </head>
-<body class="home">
+<body>
 
-    <img src="images/x-png.png" id="custom-cursor" alt="Cursor">
+<div id="cur"></div>
+<div id="cur2"></div>
 
-    <div id="canvas-container"></div>
+<!-- Subtle particle background -->
+<canvas id="bg"></canvas>
 
-    <div id="ui-layer">
-        <header>
-            <div class="logo">
-                <img class="logo-img" src="images/x-png.png" alt="Logo">
-                <div>
-                    <span class="logo-text-main">CELLXION LTD</span>
-                    <p class="nav-secondary">Cellular Intelligence Solutions</p>
-                </div>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="solutions.html">QMTS</a></li>
-                    <li><a href="gdpr.html">GDPR</a></li>
-                    <li><a href="login.html">Log in</a></li>
-                </ul>
-            </nav>
-        </header>
+<!-- Top bar -->
+<div class="top-bar">
+    <span class="tb-brand">CellXion Ltd</span>
+    <span class="tb-hint">Select a version to enter</span>
+</div>
 
-        <div class="hero">
-            <h1>Next-Generation Connectivity</h1>
-            <p>Empowering the UK and the world with cutting-edge telecommunications infrastructure, high-speed networking, and innovative data solutions.</p>
-            <button class="cta-btn" onclick="location.href='solutions.html'">Learn More</button>
-        </div>
-
-        <!-- <div class="footer-info">
-            Registered in the UK; Company Number 4780952; VAT Number 822 5778 14
-        </div> -->
-
-        <div class="footer-info">
-            Design by Matt Stone - Iron Raven Design Studio 2026
-        </div>
+<!-- Centre divider + logo -->
+<div class="cl-line"></div>
+<div class="centre-logo" id="cl">
+    <div class="cl-x">
+        <img class="logo" src="images/x-png.png" alt="" srcset="">
     </div>
+    <span class="cl-name">CellXion</span>
+</div>
 
-    <!-- Load Three.js from CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
-    <script>
-        // 1. Scene Setup
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x050505, 0.002);
+<!-- Two-panel selector -->
+<div class="shell">
 
-        // 2. Camera Setup
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 30;
-        camera.position.x = 0; // Centered to span the full screen width
+    <!-- V1 -->
+    <a href="index_v1.html" class="panel panel-left" id="p1">
+        <div class="glow"></div>
+        <span class="v-tag">Version 01</span>
+        <h2 class="v-heading">Classic<br><em>Platform</em></h2>
+        <p class="v-desc">The original cellXion experience. Animated globe, static product layout, and the full legacy interface.</p>
+        <span class="v-cta"><span class="v-cta-line"></span>Enter V1</span>
+    </a>
 
-        // 3. Renderer Setup
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
+    <!-- V2 -->
+    <a href="v2/index_v2.html" class="panel panel-right" id="p2">
+        <div class="glow"></div>
+        <span class="v-tag">Version 02</span>
+        <h2 class="v-heading">Cinematic<br><em>Redesign</em></h2>
+        <p class="v-desc">Scroll-driven frame sequences, sequential content reveals, fixed 3D hardware viewer, and full dark premium aesthetic.</p>
+        <span class="v-cta"><span class="v-cta-line"></span>Enter V2</span>
+    </a>
 
-        // 4. Create the 3D Telecom Network (Icosahedron Geometry)
-        const networkGroup = new THREE.Group();
-        scene.add(networkGroup);
+</div>
 
-        // The Core Wireframe Globe
-        const geometry = new THREE.IcosahedronGeometry(15, 2);
-        const material = new THREE.MeshBasicMaterial({ 
-            color: 0xff0000, 
-            wireframe: true,
-            transparent: true,
-            opacity: 0.15
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ── CURSOR ── */
+const $c = document.getElementById('cur');
+const $c2 = document.getElementById('cur2');
+let mx = 0, my = 0, cx = 0, cy = 0;
+
+document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    $c.style.left = mx + 'px'; $c.style.top = my + 'px';
+});
+document.querySelectorAll('a').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('hov'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('hov'));
+});
+(function lc() {
+    cx += (mx - cx) * .1; cy += (my - cy) * .1;
+    $c2.style.left = cx + 'px'; $c2.style.top = cy + 'px';
+    requestAnimationFrame(lc);
+})();
+
+/* ── ENTRANCE ── */
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        document.getElementById('p1').classList.add('loaded');
+        document.getElementById('p2').classList.add('loaded');
+        document.getElementById('cl').classList.add('show');
+    }, 120);
+});
+
+/* ── PARTICLE BACKGROUND ── */
+(() => {
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+    let W = canvas.width  = window.innerWidth;
+    let H = canvas.height = window.innerHeight;
+
+    const N = 55;
+    const pts = Array.from({ length: N }, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - .5) * .18,
+        vy: (Math.random() - .5) * .18,
+    }));
+
+    // Which half is the mouse in?
+    let hoverLeft = false, hoverRight = false;
+    document.getElementById('p1').addEventListener('mouseenter', () => hoverLeft  = true);
+    document.getElementById('p1').addEventListener('mouseleave', () => hoverLeft  = false);
+    document.getElementById('p2').addEventListener('mouseenter', () => hoverRight = true);
+    document.getElementById('p2').addEventListener('mouseleave', () => hoverRight = false);
+
+    function draw() {
+        ctx.fillStyle = 'rgba(6,6,10,0.2)';
+        ctx.fillRect(0, 0, W, H);
+
+        pts.forEach(p => {
+            // Gentle drift toward hovered half
+            if (hoverLeft  && p.x < W / 2) { p.vx -= .003; p.vy -= .001; }
+            if (hoverRight && p.x > W / 2) { p.vx += .003; p.vy -= .001; }
+
+            p.vx *= .997; p.vy *= .997;
+            p.x += p.vx; p.y += p.vy;
+            if (p.x < 0 || p.x > W) p.vx *= -1;
+            if (p.y < 0 || p.y > H) p.vy *= -1;
         });
-        const globe = new THREE.Mesh(geometry, material);
-        networkGroup.add(globe);
 
-        // The Data Nodes (Particles)
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 800;
-        const posArray = new Float32Array(particlesCount * 3);
-
-        for(let i = 0; i < particlesCount * 3; i++) {
-            // Spread particles mostly around the globe radius
-            posArray[i] = (Math.random() - 0.5) * 40;
+        // Edges
+        for (let i = 0; i < N; i++) {
+            for (let j = i + 1; j < N; j++) {
+                const dx = pts[i].x - pts[j].x;
+                const dy = pts[i].y - pts[j].y;
+                const d  = Math.sqrt(dx * dx + dy * dy);
+                if (d < 150) {
+                    // Dim the line if it crosses the centre
+                    const crossesCentre = (pts[i].x < W/2) !== (pts[j].x < W/2);
+                    const alpha = (1 - d / 150) * (crossesCentre ? 0.04 : 0.16);
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(200,23,13,${alpha})`;
+                    ctx.lineWidth = .6;
+                    ctx.moveTo(pts[i].x, pts[i].y);
+                    ctx.lineTo(pts[j].x, pts[j].y);
+                    ctx.stroke();
+                }
+            }
         }
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.15,
-            color: 0xff3333,
-            transparent: true,
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending
-        });
-        
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        networkGroup.add(particlesMesh);
 
-        // 5. Mouse Interaction
-        const customCursor = document.getElementById('custom-cursor');
-        let mouseX = 0;
-        let mouseY = 0;
-        let targetX = 0;
-        let targetY = 0;
-        const windowHalfX = window.innerWidth / 2;
-        const windowHalfY = window.innerHeight / 2;
-
-        // Restore last known mouse position
-        const savedCursorX = sessionStorage.getItem('cursorX');
-        const savedCursorY = sessionStorage.getItem('cursorY');
-        if (savedCursorX && savedCursorY) {
-            customCursor.style.left = savedCursorX + 'px';
-            customCursor.style.top = savedCursorY + 'px';
-        } else {
-            customCursor.style.opacity = '0';
-        }
-
-        document.addEventListener('mousemove', (event) => {
-            customCursor.style.opacity = '1';
-            customCursor.style.left = event.clientX + 'px';
-            customCursor.style.top = event.clientY + 'px';
-            sessionStorage.setItem('cursorX', event.clientX);
-            sessionStorage.setItem('cursorY', event.clientY);
-            mouseX = (event.clientX - windowHalfX);
-            mouseY = (event.clientY - windowHalfY);
+        // Dots
+        pts.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 1.1, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(200,23,13,0.45)';
+            ctx.fill();
         });
 
-        // 6. Animation Loop
-        const clock = new THREE.Clock();
+        requestAnimationFrame(draw);
+    }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            const elapsedTime = clock.getElapsedTime();
+    ctx.fillStyle = '#06060A';
+    ctx.fillRect(0, 0, W, H);
+    draw();
 
-            // Base rotation
-            networkGroup.rotation.y += 0.002;
-            networkGroup.rotation.x += 0.001;
-            
-            // Particle wave effect
-            particlesMesh.rotation.y = -elapsedTime * 0.05;
-
-            // Smooth mouse interaction (Parallax effect)
-            targetX = mouseX * 0.001;
-            targetY = mouseY * 0.001;
-            
-            networkGroup.rotation.y += 0.05 * (targetX - networkGroup.rotation.y);
-            networkGroup.rotation.x += 0.05 * (targetY - networkGroup.rotation.x);
-
-            renderer.render(scene, camera);
-        }
-
-        animate();
-
-        // 7. Handle Window Resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
+    window.addEventListener('resize', () => {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    });
+})();
+</script>
 </body>
 </html>
