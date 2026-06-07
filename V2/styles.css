@@ -1,0 +1,457 @@
+/* --- HASHGRAPH VC PREMIUM CINEMATIC THEME --- */
+:root {
+    --bg-dark: #070708;
+    --text-white: #ffffff;
+    --text-muted: #62626c;
+    --accent-red: #ff1a1a;
+    --border-dark: #16161a;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* Subtle Film Grain / Tech Noise Overlay via Base64 Asset CSS */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 999;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Custom Interactive Cursor Element across Solutions Layout Matrix */
+#custom-cursor {
+    position: fixed;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* --- THE "IRONCLAD" ISOLATION FRAMEWORK --- */
+#canvas-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+}
+
+#scroll-canvas-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    background-color: #070708;
+}
+
+#hero-scroll-canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+#ui-layer {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #1d111142;
+}
+
+/* Unified Base Section Configuration for Cinematic Text Reveals */
+.scroll-section {
+    box-sizing: border-box;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 10%;
+    padding-right: 10%;
+    pointer-events: none;
+}
+
+/* Special Structural Offsets for Edge Content Layouts */
+.scroll-section.state-first-section {
+    padding-top: 140px;
+}
+
+.scroll-section.state-final-section {
+    min-height: 100vh; 
+    padding-bottom: 10vh;
+}
+
+/* --- HASHGRAPH VC STRUCTURAL FIXED HEADER --- */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 10%;
+    z-index: 1000; 
+    pointer-events: none;
+    background-color: #07070842;
+
+}
+
+.logo, nav {
+    pointer-events: auto;
+}
+
+.logo {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.logo-img {
+    height: 65px;
+    width: auto;
+    margin-top: 3px;
+}
+
+.logo-text-main {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: var(--font-sans);
+}
+
+.nav-secondary {
+    font-size: 1.1rem;
+    color: var(--accent-red);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.2rem;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 4rem;
+    margin-left: auto;
+}
+
+nav a {
+    color: var(--text-white);
+    text-decoration: none;
+    font-size: 1.4rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    padding-bottom: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; width: 0; height: 1px;
+    background-color: var(--accent-red);
+    transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+nav a:hover {
+    color: var(--text-white);
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+/* --- HERO SECTION RECONSTRUCTION & SCROLL REVEALS --- */
+.hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 1200px;
+}
+
+/* --- Cinematic Scroll Reveal System --- */
+.reveal-group {
+    max-width: 1200px;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 1s cubic-bezier(0.215, 0.610, 0.355, 1), 
+                transform 1s cubic-bezier(0.215, 0.610, 0.355, 1);
+    will-change: transform, opacity;
+}
+
+.reveal-group.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.hero-manifesto-tag {
+    font-family: var(--font-mono);
+    color: var(--accent-red);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: fadeInText 1s ease forwards;
+}
+
+.hero h1 {
+    font-size: 5.5rem;
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -3px;
+    margin-bottom: 2.5rem;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(40px);
+    animation: revealText 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    color: #d5d5d6;
+    margin-bottom: 3.5rem;
+    max-width: 620px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: revealText 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+}
+
+/* Staggered interior typography reveal mechanics */
+.reveal-group .hero-manifesto-tag,
+.reveal-group h1,
+.reveal-group p,
+.reveal-group .cta-btn {
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), 
+                transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.reveal-group.active .hero-manifesto-tag { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+.reveal-group.active h1                 { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+.reveal-group.active p                  { opacity: 1; transform: translateY(0); transition-delay: 0.4s; }
+.reveal-group.active .cta-btn            { opacity: 1; transform: translateY(0); transition-delay: 0.5s; }
+
+/* Minimalist Underline Action Token */
+.cta-btn {
+    background: transparent;
+    color: var(--text-white);
+    border: none;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    width: fit-content;
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    transition: border-color 0.3s ease, color 0.3s ease;
+}
+
+.cta-btn:hover {
+    border-color: var(--accent-red);
+    color: var(--text-white);
+}
+
+/* --- ASYMMETRIC SOLUTIONS PANEL LAYOUT --- */
+.product-section {
+    display: flex;
+    flex: 1;
+    min-height: calc(100vh - 140px);
+}
+
+.product-info {
+    width: 45%;
+    padding: 160px 4rem 6rem 10%;
+    overflow-y: auto;
+    height: auto;
+}
+
+.product-info::-webkit-scrollbar {
+    width: 2px;
+}
+.product-info::-webkit-scrollbar-thumb {
+    background: var(--border-dark);
+}
+
+.product-info h1 {
+    font-size: 4.5rem;
+    font-weight: 400;
+    letter-spacing: -2px;
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+}
+
+.index-num {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.product-info p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #a1a1aa;
+    margin-bottom: 2.5rem;
+}
+
+/* Tech Specs Lists */
+.product-info ul {
+    list-style: none;
+    border-top: 1px solid var(--border-dark);
+    margin-top: 4rem;
+}
+
+.product-info ul li {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border-dark);
+    font-size: 0.85rem;
+    color: #a1a1aa;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.product-info ul li ul {
+    border: none;
+    margin: 0.5rem 0 0 0;
+    width: 100%;
+}
+
+.product-info ul li ul li {
+    padding: 0.5rem 0;
+    border: none;
+    color: var(--text-muted);
+}
+
+/* Structural Showroom for the Hardware Unit */
+.product-visuals {
+    width: 55%;
+    position: relative;
+    height: calc(100vh - 140px);
+    border-left: 1px solid var(--border-dark);
+}
+
+#model-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+/* --- FOOTER REGION --- */
+.footer-info {
+    padding: 2rem 4rem;
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border-dark);
+    background-color: #07070842;
+}
+
+/* --- SYSTEM REVEAL KEYFRAMES --- */
+@keyframes fadeInText {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes revealText {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- SEQUENTIAL FADE OVERRIDES ---
+   The JS drives opacity + transform directly on .reveal-group,
+   so we remove the class-transition and let the JS animation be
+   the single source of truth. Child stagger delays are kept so
+   they still play when .active is added. */
+
+.reveal-group {
+    transition: none !important;
+    opacity: 0;
+    transform: translateY(0px);
+    will-change: opacity, transform;
+}
+
+/* Section 1 must be fully visible before JS initialises — no flash */
+.state-first-section .reveal-group {
+    opacity: 1;
+}
+
+/* Children still stagger in via .active, but we don't want their
+   own opacity/transform start states fighting the parent JS values. */
+.reveal-group .hero-manifesto-tag,
+.reveal-group h1,
+.reveal-group p,
+.reveal-group .cta-btn {
+    opacity: 0;
+    transform: translateY(12px);
+}
+
+/* Section 1 children are visible immediately too */
+.state-first-section .reveal-group .hero-manifesto-tag,
+.state-first-section .reveal-group h1,
+.state-first-section .reveal-group p,
+.state-first-section .reveal-group .cta-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- BREAKPOINT RESPONSIVENESS MATRIX --- */
+@media (max-width: 1024px) {
+    header { padding: 2rem; }
+    .hero { padding: 0 2rem; }
+    .hero h1 { font-size: 3.5rem; }
+    .product-section { flex-direction: column; }
+    .product-info, .product-visuals { width: 100%; height: auto; padding: 2rem; }
+}

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(taskkill /PID 26024 /F)",
+      "PowerShell(Copy-Item \"C:\\\\Users\\\\matt.stone\\\\OneDrive\\\\Desktop\\\\CanvasPrime\\\\target\\\\release\\\\canvas_prime_core.dll\" \"C:\\\\Users\\\\matt.stone\\\\OneDrive\\\\Desktop\\\\CanvasPrime\\\\canvas_prime_app\\\\build\\\\windows\\\\x64\\\\runner\\\\Debug\\\\\" -Force)",
+      "Bash(copy \"C:\\\\Users\\\\matt.stone\\\\OneDrive\\\\Desktop\\\\CanvasPrime\\\\canvas_prime_core\\\\target\\\\release\\\\canvas_prime_core.dll\" \"C:\\\\Users\\\\matt.stone\\\\OneDrive\\\\Desktop\\\\CanvasPrime\\\\canvas_prime_app\\\\build\\\\windows\\\\x64\\\\runner\\\\Debug\\\\\" 2>&1)",
+      "PowerShell(Copy-Item \"C:\\\\Users\\\\matt.stone\\\\OneDrive\\\\Desktop\\\\CanvasPrime\\\\canvas_prime_core\\\\target\\\\release\\\\canvas_prime_core.dll\" \"C:\\\\Users\\\\matt.stone\\\\OneDrive\\\\Desktop\\\\CanvasPrime\\\\canvas_prime_app\\\\build\\\\windows\\\\x64\\\\runner\\\\Debug\\\\\" -Force)",
+      "Bash(grep -v \"^$\")",
+      "Bash(python -c \"import PIL; print\\('Pillow OK'\\)\")",
+      "Bash(python -m pip install Pillow --quiet)",
+      "Bash(python make_icon.py)",
+      "Bash(flutter clean *)"
+    ]
+  }
+}

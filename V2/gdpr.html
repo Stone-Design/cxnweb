@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDPR Policy | cellXion Ltd</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ── GDPR page overrides ── */
+        .gdpr-section {
+            position: relative;
+            z-index: 10;
+            padding: 160px 10% 8rem;
+            max-width: 1600px;
+        }
+
+        .gdpr-section .index-num {
+            margin-bottom: 1.5rem;
+        }
+
+        .gdpr-section h1 {
+            font-size: 4.5rem;
+            font-weight: 400;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            margin-bottom: 4rem;
+            line-height: 1;
+        }
+
+        .gdpr-block {
+            margin-bottom: 3.5rem;
+            /* border-top: 1px solid var(--border-dark); */
+            padding-top: 2rem;
+        }
+
+        .gdpr-block h3 {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-red);
+            margin-bottom: 1.25rem;
+        }
+
+        .gdpr-block p {
+            font-size: 0.95rem;
+            line-height: 1.75;
+            color: #a1a1aa;
+        }
+
+        .gdpr-block ul {
+            list-style: none;
+            margin-top: 0;
+            border-top: none;
+        }
+
+        .gdpr-block ul li {
+            padding: 0.75rem 0;
+            /* border-bottom: 1px solid var(--border-dark); */
+            font-size: 0.88rem;
+            color: #a1a1aa;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .gdpr-block ul li::before {
+            content: '—';
+            color: var(--accent-red);
+            font-family: var(--font-mono);
+            flex-shrink: 0;
+        }
+
+        .gdpr-contact {
+            margin-top: 3rem;
+            padding: 1.5rem 2rem;
+            /* border: 1px solid var(--border-dark); */
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .gdpr-contact a {
+            color: var(--accent-red);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .gdpr-contact a:hover { opacity: 0.7; }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div id="ui-layer">
+        <header>
+            <div class="logo">
+                <img class="logo-img" src="images/x-png.png" alt="Logo">
+                <div>
+                    <span class="logo-text-main">CELLXION</span>
+                    <p class="nav-secondary">Cellular Intelligence Solutions</p>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="solutions.html">QMTS</a></li>
+                    <li><a href="#" style="color: var(--accent-red);">GDPR</a></li>
+                    <li><a href="login.html">Log in</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="gdpr-section">
+            <span class="index-num">// LEGAL / DATA PROTECTION</span>
+            <h1>Privacy &amp; GDPR Policy</h1>
+
+            <div class="gdpr-block">
+                <h3>// 01 — Information We Collect</h3>
+                <p>We are committed to protecting and respecting your privacy. Under the General Data Protection Regulation (GDPR), we only collect data that is strictly necessary for providing our telecommunications and telemetry services. This includes contact details, network identifiers, and standard system logs.</p>
+            </div>
+
+            <div class="gdpr-block">
+                <h3>// 02 — How We Use Your Data</h3>
+                <p>Your data is exclusively used to maintain secure connections, ensure route managing service (QRMS) functionality, and provide essential customer support. We do not sell your personal data to third parties. All internal processing is done in compliance with UK and EU data protection laws.</p>
+            </div>
+
+            <div class="gdpr-block">
+                <h3>// 03 — Data Security</h3>
+                <p>Security is at the core of our QRMS link protocol. We encrypt all telemetry and personal data using link-unique random keys. Your data is stored on secure servers with restricted access, meaning that even in the unlikely event of a breach, intercepted data remains cryptographically secure.</p>
+            </div>
+
+            <div class="gdpr-block">
+                <h3>// 04 — Your Rights</h3>
+                <ul>
+                    <li>The right to be informed about how your data is being used.</li>
+                    <li>The right of access to your personal data.</li>
+                    <li>The right to rectification of inaccurate or incomplete data.</li>
+                    <li>The right to erasure — the "right to be forgotten".</li>
+                    <li>The right to restrict processing.</li>
+                    <li>The right to data portability.</li>
+                    <li>The right to object to automated decision-making and profiling.</li>
+                </ul>
+            </div>
+
+            <div class="gdpr-contact">
+                DATA PROTECTION OFFICER &nbsp;·&nbsp; CELLXION LTD<br>
+                For enquiries or to exercise your rights, contact:<br>
+                <a href="mailto:privacy@cellxion.net">privacy@cellxion.net</a>
+            </div>
+        </div>
+
+        <footer class="footer-info">
+            <div>CELLXION LTD // GLOBAL OPERATIONS 2026</div>
+            <div>DESIGN BY MATT STONE — IRON RAVEN STUDIO</div>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QMTS Solutions | cellXion Ltd</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preload" href="images/qmts-v1.glb" as="fetch" crossorigin="anonymous">
+    <style>
+        /* ── Fixed 3D canvas: always occupies right half, full viewport height ── */
+        #model-canvas {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 50vw;
+            height: 100vh;
+            z-index: 5;          /* above background canvas, below header */
+            pointer-events: none;
+            display: block;
+        }
+
+        /* ── Loading label centred in the right half ── */
+        #model-loading {
+            position: fixed;
+            top: 50%;
+            right: 25vw;         /* centre of the right 50vw */
+            transform: translate(50%, -50%);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-red);
+            z-index: 6;
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 0.6s ease;
+        }
+        #model-loading.hidden { opacity: 0; }
+
+        /* ── Constrain text column to left half so it never overlaps model ── */
+        .product-section {
+            /* override the flex layout — left col scrolls, right col is handled by fixed canvas */
+            display: block;
+        }
+        .product-info {
+            width: 50%;          /* occupy only left half */
+            min-height: 100vh;
+            padding: 160px 4rem 8rem 10%;
+        }
+        /* Hide the now-empty product-visuals shell */
+        .product-visuals { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Fixed model canvas — independent of all layout -->
+    <canvas id="model-canvas"></canvas>
+    <div id="model-loading">Initialising 3D Model...</div>
+
+    <div id="ui-layer">
+        <header>
+            <div class="logo">
+                <img class="logo-img" src="images/x-png.png" alt="Logo">
+                <div>
+                    <span class="logo-text-main">CELLXION</span>
+                    <p class="nav-secondary">Intelligence Infrastructure</p>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#" style="color: var(--accent-red);">QMTS</a></li>
+                    <li><a href="gdpr.html">GDPR</a></li>
+                    <li><a href="login.html">Log in</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="product-section">
+            <div class="product-info">
+                <span class="index-num">// SERIES 01 / HARDWARE</span>
+                <h1>QMTS SOLUTIONS</h1>
+                
+                <p>This system allows several remote devices or hosts to securely communicate as though they are connected by a single IP network with uncomplicated routing. This is achieved through a central hub, the Quick Route Managing Service (QRMS), to which all clients connect.</p>
+                
+                <p>In cases where a device has more than one connection, the QRMS also evaluates and aggregates individual link quality to maximise throughput and availability. Connections to the QRMS can be made over any public or private TCP/IP network and are insensitive to intermediate NAT and firewall operations.</p>
+                
+                <p>For security, the QRMS link protocol also encrypts all data using link-unique random keys agreed on a per-connection basis through Diffie-Hellman exchange (ephemeral keying). Optional authentication of both the client and QRMS can be performed by exchanging cryptographic hashes which incorporate pre-shared key material.</p>
+                
+                <p>Quad Modem Telemetry System (QMTS) devices are one type of QRMS client and are designed to utilise up to 4 wireless modems to provide exceptional link reliability and throughput when connecting to the central QRMS.</p>
+
+                <ul>
+                    <li><span>Input Voltage Range</span> <span>9V to 28V DC</span></li>
+                    <li><span>Nominal Current Draw</span> <span>1A @ 12V</span></li>
+                    <li><span>Operational Modulation</span> <span>Up to 4 Cellular Modules</span></li>
+                    <li><span>Gigabit Interfaces</span> <span>2x RJ45 Ruggedized Ethernet</span></li>
+                    <li><span>Telemetry Array</span> <span>GPS & Wi-Fi Tracking Transceivers</span></li>
+                </ul>
+                
+                <br><br>
+                <a href="document/datasheet.pdf" class="cta-btn" download="datasheet.pdf">Download Technical Datasheet &darr;</a>
+            </div>
+
+            <!-- product-visuals kept in markup for CSS compatibility, hidden via style above -->
+            <div class="product-visuals"></div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+    
+    <script>
+        // ── MODEL VIEWER — fixed canvas, right 50% of viewport ───────────────
+        const modelCanvas = document.getElementById('model-canvas');
+
+        // Size canvas to match its CSS fixed dimensions
+        function getModelCanvasSize() {
+            return {
+                w: Math.round(window.innerWidth  * 0.5),
+                h: Math.round(window.innerHeight)
+            };
+        }
+
+        const modelScene    = new THREE.Scene();
+        const modelRenderer = new THREE.WebGLRenderer({
+            canvas:    modelCanvas,
+            antialias: true,
+            alpha:     true           // transparent background so grid shows through
+        });
+        modelRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        modelRenderer.setClearColor(0x000000, 0); // fully transparent
+
+        const { w: mW, h: mH } = getModelCanvasSize();
+        modelRenderer.setSize(mW, mH);
+
+        const modelCamera = new THREE.PerspectiveCamera(40, mW / mH, 0.1, 100);
+        modelCamera.position.set(0, 0, 9); // slight upward offset so model sits mid-frame
+
+        // Lighting
+        modelScene.add(new THREE.AmbientLight(0xffffff, 0.8));
+
+        const keyLight = new THREE.DirectionalLight(0xffffff, 3.0);
+        keyLight.position.set(10, 20, 10);
+        modelScene.add(keyLight);
+
+        const rimLight = new THREE.DirectionalLight(0xff1a1a, 1.5);
+        rimLight.position.set(-10, -5, -10);
+        modelScene.add(rimLight);
+
+        const fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        fillLight.position.set(0, -10, 5);
+        modelScene.add(fillLight);
+
+        // Load the GLB model
+        let productModelGroup = null;
+        const loadingLabel    = document.getElementById('model-loading');
+
+        const dracoLoader = new THREE.DRACOLoader();
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.3/');
+
+        const gltfLoader = new THREE.GLTFLoader();
+        gltfLoader.setDRACOLoader(dracoLoader);
+
+        gltfLoader.load(
+            'images/qmts-v1.glb',
+            (gltf) => {
+                // Success
+                loadingLabel.classList.add('hidden');
+
+                const model = gltf.scene;
+
+                // Centre the model on its own bounding box
+                const box    = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                model.position.sub(center);
+
+                // Scale so longest axis fills the view comfortably
+                const size   = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale  = maxDim > 0 ? 3.5 / maxDim : 1;
+
+                productModelGroup = new THREE.Group();
+                productModelGroup.add(model);
+                productModelGroup.scale.setScalar(scale);
+
+                modelScene.add(productModelGroup);
+            },
+            undefined,
+            (err) => {
+                console.error('GLB load error:', err);
+                loadingLabel.textContent = 'Model unavailable';
+            }
+        );
+
+        // ── MOUSE PARALLAX ────────────────────────────────────────────────────
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth  / 2) * 0.0005;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.0005;
+        });
+
+        // ── RENDER LOOP ───────────────────────────────────────────────────────
+        const clock = new THREE.Clock();
+
+        function runLoop() {
+            requestAnimationFrame(runLoop);
+            const elapsed = clock.getElapsedTime();
+
+            // Model: continuous Y-axis rotation (360° loop) + gentle X bob
+            if (productModelGroup) {
+                productModelGroup.rotation.y  = elapsed * 0.4;
+                productModelGroup.rotation.x  = Math.sin(elapsed * 0.3) * 0.08;
+            }
+
+            modelRenderer.render(modelScene, modelCamera);
+        }
+        runLoop();
+
+        // ── RESIZE ───────────────────────────────────────────────────────────
+        window.addEventListener('resize', () => {
+            // Model renderer — always right 50% × full height
+            const { w, h } = getModelCanvasSize();
+            modelRenderer.setSize(w, h);
+            modelCamera.aspect = w / h;
+            modelCamera.updateProjectionMatrix();
+        });
+    </script>
+</body>
+</html>
