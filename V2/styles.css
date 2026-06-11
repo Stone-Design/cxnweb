@@ -1,6 +1,6 @@
 /* --- HASHGRAPH VC PREMIUM CINEMATIC THEME --- */
 :root {
-    --bg-dark: #070708;
+    --bg-dark: #4d4d57;
     --text-white: #ffffff;
     --text-muted: #62626c;
     --accent-red: #ff1a1a;
@@ -397,6 +397,8 @@ nav a:hover::after {
     align-items: center;
     border-top: 1px solid var(--border-dark);
     background-color: #07070842;
+    z-index: 10;
+
 }
 
 /* --- SYSTEM REVEAL KEYFRAMES --- */
